@@ -368,7 +368,7 @@ class WaifuDiffusionInterrogator(Interrogator):
         model_path='model.onnx',
         tags_path='selected_tags.csv',
         repo_id=None,
-        is_hf=False,
+        is_hf=True,
     ) -> None:
         super().__init__(name)
         self.repo_id = repo_id
@@ -382,7 +382,11 @@ class WaifuDiffusionInterrogator(Interrogator):
         self.is_hf = is_hf
 
     def download(self) -> None:
-        mdir = Path(shared.models_path, 'interrogators')
+        dashed_part = 'models--' + '--'.join(self.repo_id.split('/'))
+        mdir = Path(shared.models_path, 'interrogators', dashed_part)
+        # local_dir = Path(shared.models_path, 'interrogators', dashed_part)
+
+        # mdir = Path(shared.models_path, 'interrogators')
         if self.is_hf:
             cache = getattr(shared.opts, 'tagger_hf_cache_dir', Its.hf_cache)
             print(f"Loading {self.name} model file from {self.repo_id}, "
@@ -397,34 +401,38 @@ class WaifuDiffusionInterrogator(Interrogator):
                 filename=self.tags_path,
                 cache_dir=cache)
         else:
-            model_path = self.local_model
-            tags_path = self.local_tags
+            print('get model path')
+            model_path = os.path.sep.join(mdir)+'/model.onnx'
+            print(model_path)
+            tags_path = os.path.sep.join(mdir)+'/selected_tags.csv'
+            print(tags_path)
 
-        download_model = {
-            'name': self.name,
-            'model_path': model_path,
-            'tags_path': tags_path,
-        }
-        mpath = Path(mdir, 'model.json')
 
-        data = [download_model]
+        # download_model = {
+        #     'name': self.name,
+        #     'model_path': model_path,
+        #     'tags_path': tags_path,
+        # }
+        # mpath = Path(mdir, 'model.json')
 
-        if not os.path.exists(mdir):
-            os.mkdir(mdir)
+        # data = [download_model]
 
-        elif os.path.exists(mpath):
-            with io.open(file=mpath, mode='r', encoding='utf-8') as filename:
-                try:
-                    data = json.load(filename)
-                    # No need to append if it's already contained
-                    if download_model not in data:
-                        data.append(download_model)
-                except json.JSONDecodeError as err:
-                    print(f'Adding download_model {mpath} raised {repr(err)}')
-                    data = [download_model]
+        # if not os.path.exists(mdir):
+        #     os.mkdir(mdir)
 
-        with io.open(mpath, 'w', encoding='utf-8') as filename:
-            json.dump(data, filename)
+        # elif os.path.exists(mpath):
+        #     with io.open(file=mpath, mode='r', encoding='utf-8') as filename:
+        #         try:
+        #             data = json.load(filename)
+        #             No need to append if it's already contained
+                    # if download_model not in data:
+                    #     data.append(download_model)
+                # except json.JSONDecodeError as err:
+                #     print(f'Adding download_model {mpath} raised {repr(err)}')
+                #     data = [download_model]
+        #
+        # with io.open(mpath, 'w', encoding='utf-8') as filename:
+        #     json.dump(data, filename)
         return model_path, tags_path
 
     def load(self) -> None:
