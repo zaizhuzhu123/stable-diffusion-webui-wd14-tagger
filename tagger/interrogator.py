@@ -368,7 +368,7 @@ class WaifuDiffusionInterrogator(Interrogator):
         model_path='model.onnx',
         tags_path='selected_tags.csv',
         repo_id=None,
-        is_hf=True,
+        is_hf=False,
     ) -> None:
         super().__init__(name)
         self.repo_id = repo_id
