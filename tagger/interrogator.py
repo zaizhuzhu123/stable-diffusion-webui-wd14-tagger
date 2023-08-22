@@ -402,9 +402,9 @@ class WaifuDiffusionInterrogator(Interrogator):
                 cache_dir=cache)
         else:
             print('get model path')
-            model_path = os.path.sep.join(mdir)+'/model.onnx'
+            model_path = os.path.sep.join(mdir)+'/snapshots/model.onnx'
             print(model_path)
-            tags_path = os.path.sep.join(mdir)+'/selected_tags.csv'
+            tags_path = os.path.sep.join(mdir)+'/snapshots/selected_tags.csv'
             print(tags_path)
 
 
